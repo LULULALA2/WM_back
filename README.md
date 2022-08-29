@@ -124,7 +124,6 @@ if '<' in data.get('content'):
 <br>
 
 ### 2. index.html로 돌아왔을 때 로그인을 다시해야하는 경우 방지
-
 <br>[> 📑코드 보기 <](https://github.com/cmjcum/WM_front/blob/master/static/js/index.js#L6)
 <br>로그인 후에 토큰 유효시간이 남아있더라도 기본 주소로 들어갈 경우 index.html로 이동되어서 로그인을 다시 해야만 메인 페이지로 접근 가능한 경우가 있어 불편하다는 사용자 피드백이 있었습니다. 그래서 index.html 페이지에 접근할 경우 사용자자가 발급받은 토큰의 시간과 현재시간을 비교해서 토큰 유효시간이 남아있을 경우 메인 페이지로 바로 이동시키도록 수정하였습니다.
 
