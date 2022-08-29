@@ -63,12 +63,20 @@
 
 # 🧨TroubleShooting
 
-### 1. python 버전에 따른 패키지 관리자 호환 문제
+### 1. python 버전에 따른 호환 문제
+① python_alpine 버전을 사용하면서 패키지 관리자를 apt-get 사용
+
+알파인 리눅스는 초경량화된 배포판이므로 docker에서 자주 사용되는 리눅스 이미지인데, 도커와 이미지 버전에 대해서 잘 모르는 상태로 도커를 공부하던 참고영상에서 사용한 버전을 그대로 사용했습니다. 알파인 버전에서는 패키지 관리자로 apk를 사용한다는 사실을 모르고 apt-get을 사용했고 계속 apt-get을 찾을 수 없다는 에러가 발생해서 구글링을 통해 버전에 대한 정보를 얻고 공부해서 수정하게 되었습니다.
+
+② python_alpine 버전에서는 pytorch, tensorflow 사용불가하여 python_buster 버전으로 수정
+
+위에서 알파인 버전으로 Dockerfile 을 작성하여 1차 배포를 마치고 머신러닝을 추가하여 2차 배포를 앞두고 테스트 중이었습니다. pythorh 와 tensorflow 가 들어가면 인식을 못하고 패키지를 설치하지 못하는 에러가 발생했습니다. 알파인 버전에서는 두 패키지를 설치하는 데 필수요소가 들어있지 않아서 설치 불가능 한 것으로 예상을 하고, buster 버전으로 바꾸어주니 에러없이 설치되었습니다. 
+
+<br>
 
 ### 2. pytorch, tensorflow run 명령어로 설치
-- pytorch, tensorflow는 Requirements.txt 로 한번에 설치하려고 하면 메모리가 부족하다는 에러 메세지 발생
-
---no-cache-dir
+- pytorch, tensorflow는 Requirements.txt 로 한번에 설치하려고 하면 MemoryError 발생
+이 패키지를 설치할 때는 캐시를 사용하지 않도록 하는 --no-cache-dir 옵션을 추가해주고, 두 패키지가 용량이 크기때문에 Dockerfile 에서 설치하도록 따로 빼주었습니다.
 
 ```python
 # Dockerfile
@@ -86,7 +94,7 @@ RUN pip install --no-cache-dir torch==1.11.0+cpu torchvision==0.12.0+cpu torchau
 <br><code>/home/ubuntu/.aws/:/root/.aws/:ro</code>
 <br>
 
-### 4. 프론트 CICD 반영 → 무효화
+### 4. 프론트 CICD 한 내용이 바로 반영이 안되는 문제
 프론트 팀 깃허브에서 master에 merge를 하게되면 git actions 을 통해서 자동으로 S3에 그 내용이 갱신되도록 해놓았습니다. 그런데 S3에 내용이 갱신되었더라도 누군가는 반영이 안된 웹사이트를 보고 있거나 새로고침을 하면 오히려 이전의 내용으로 돌아가는 등의 문제가 있었습니다. 프론트 배포를 할 때 S3를 CloudFront와 연결하여 배포하였기 때문에 merge를 할 때마다 CloudFront 무효화 메뉴에서 /* 경로의 파일을 모두 무효화하도록 했습니다.
 
 <br>
